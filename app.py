@@ -2,15 +2,23 @@ from flask import Flask, jsonify, request
 from views import views
 from RAG import load_index, construct_index
 
-
+# Initialize the Flask web application
 app = Flask(__name__)
-app.register_blueprint(views, url_prefix="/views")
+app.register_blueprint(views, url_prefix="/views")  # Register the 'views' blueprint with the app
 
-index = None
+index = None  # A global variable to store an index, initially set to None
 
 
 @app.route('/callLoad')
 def callLoadIndex():
+    """
+    This function is called when the '/callLoad' URL is accessed.
+
+    It loads an index using the 'load_index' function from the RAG module and updates the global 'index' variable.
+
+    Returns:
+        A JSON response indicating that the index was loaded successfully, along with a status code of 200 (OK).
+    """
     global index
     index = load_index()
     return jsonify({"message": "Index loaded successfully"}), 200
@@ -18,6 +26,14 @@ def callLoadIndex():
 
 @app.route('/callGenerate')
 def callGenerateIndex():
+    """
+    This function is called when the '/callGenerate' URL is accessed.
+
+    It creates a new index using the 'construct_index' function from the RAG module, based on the contents of a directory called "Extracted_Data", and updates the global 'index' variable.
+
+    Returns:
+        A JSON response indicating that the index was constructed successfully, along with a status code of 200 (OK).
+    """
     global index
     index = construct_index(directory_path="Extracted_Data")
     return jsonify({"message": "Index constructed successfully"}), 200
@@ -25,6 +41,16 @@ def callGenerateIndex():
 
 @app.route('/query', methods=['POST'])
 def queryIndex():
+    """
+    This function handles POST requests to the '/query' URL.
+
+    It takes a JSON payload with a 'prompt' field, queries the index using this prompt, and returns the result.
+
+    If the index is not loaded or constructed, or if the 'prompt' is missing, it returns an error message.
+
+    Returns:
+        A JSON response with the query result if successful, or an error message if something goes wrong.
+    """
     global index
     if index is None:
         return jsonify({"error": "Index not loaded or constructed"}), 400
@@ -48,11 +74,22 @@ def queryIndex():
 
 
 def convert_response_to_serializable(response):
-    # Implement this function based on how NodeWithScore and query response look
-    # Example placeholder implementation:
+    """
+    Converts a query response into a format that can be easily converted to JSON.
+
+    This is a placeholder implementation; it needs to be customized based on the actual response format.
+
+    Args:
+        response: The query response to convert.
+
+    Returns:
+        A serializable version of the response, or a string if conversion fails.
+    """
     if hasattr(response, 'to_dict'):
-        return response.to_dict()  # or whatever method you use
-    return str(response)  # Fallback to string conversion
+        return response.to_dict()  # Example conversion to dictionary
+    return str(response)  # Fallback to string representation
+
 
 if __name__ == '__main__':
+    # Run the Flask web application on port 3000
     app.run(debug=False, port=3000)
