@@ -37,6 +37,6 @@ run the app.py script which is a flask website that integrates the LLM model wit
 then head to the page http://127.0.0.1:3000/views
 
 first press the generate button, it will generate our model, everytime you start up the website press load model.
-These buttons calls the RAG.py
+These buttons calls the RAG.py functions
 
 
